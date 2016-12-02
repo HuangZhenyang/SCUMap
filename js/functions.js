@@ -286,6 +286,7 @@ function openInfo(content, e) {
 
 //清除路径函数
 function clearPaths() {
+	var routeplan = document.getElementById("routePlanText");
 	for (let i = 0; i < polylines.length; ++i) {
 		map.removeOverlay(polylines[i]);
 	}
@@ -294,6 +295,14 @@ function clearPaths() {
 
 	//把文本框内容清除
 	setText("", "", "");
+	
+	//清除路径规划
+	routeplan.value = "";
+	
+	//清除路径规划提示信息
+	tip = "";
+	
+	points.length = 0;
 }
 
 //切换夜间模式函数
@@ -353,11 +362,13 @@ function setPolyline() {
 	drawPath(startpoint, endpoint, sindex, eindex);
 
 	setText(scupoint[sindex].name, scupoint[eindex].name, D[sindex][eindex]);
+	
+	
 }
 
 //清除历史记录
 function clearHistory() {
-	var historylist = document.getElementById("history");
+	var historylist = document.getElementById("history"), routeplan = document.getElementById("routePlanText");
 	var l = historylist.length; // 因为清掉以后historylist长度会变化
 	for (let i = 0; i < l; ++i) {
 		historylist.remove(0); // 清掉以后historylist里的元素下边会改变
@@ -368,6 +379,9 @@ function clearHistory() {
 
 	//清除文本框的内容
 	setText("", "", "");
+	
+	//清除路径信息
+	routeplan.value = "";
 }
 
 //路书的开始函数
@@ -427,16 +441,16 @@ function routePlan() {
 		//alert(direction);
 		
 		if(direction === 1){
-			alert("东北");
+			//alert("东北");
 			tip += "向东北";
 		}else if(direction === 2){
-			alert("西北");
+			//alert("西北");
 			tip += "向西北";
 		}else if(direction === 3){
-			alert("西南");
+			//alert("西南");
 			tip += "向西南";
 		}else if(direction === 4){
-			alert("东南");
+			//alert("东南");
 			tip += "向东南";
 		}
 		
@@ -445,7 +459,7 @@ function routePlan() {
 		if(eindex < scupoint.length){
 			tip += ("到达" + scupoint[eindex].name);
 		}
-		tip += "\r\n";
+		tip += ";\r\n";
 		
 	}
 	alert(tip);
