@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="四川大学江安校区地图" />
+	<meta name="description" content="数据结构课程设计" />
+	<title>四川大学地图</title>
+
+	<!--引用百度地图API-->
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YSCzbX9BEyTj3AeHlzrQx3vBCTI7tNKd"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/library/LuShu/1.2/src/LuShu_min.js"></script>
+
+	<!--引用经纬度转换测距  和   地点   和   常数  和 Jquery-->
+	<script language="javascript" src="js/PrjPoint.js"></script>
+	<script language="javascript" src="js/point.js"></script>
+	<script language="javascript" src="js/constant.js"></script>
+	<script language="javascript" src="js/functions.js"></script>
+	<script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+
+	<!--Checkbox样式-->
+	<link rel="stylesheet" href="css/normalize.css">
+	<link rel="stylesheet" href="css/checkbox.css" media="screen" type="text/css" />
+
+	<!--按钮样式-->
+	<link rel="stylesheet" href="css/button.css">
+
+</head>
+
+<body>
+
+	<!--百度地图容器-->
+	<div style="width:800px;height:550px;border:#ccc solid 1px;font-size:12px" id="map"></div>
+	<!--文本框以及按钮-->
+	<div style="color:#666;line-height:25px;" id="componentsDiv">
+		<!--切换夜间模式的CheckBox-->
+		<h4>白天/夜间模式</h4>
+		<input class='tgl tgl-light' id='cb1' type='checkbox' onclick="transferToNight()">
+		<label class='tgl-btn' for='cb1'></label>
+		<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
+		<!--计算功能组件-->
+		<p></p>
+		<span>起点为:</span>
+		<input type="text" readonly="" id="startPointText" style="display:inline-block;background:#EBEBE4;border:#7F9DB9 solid 1px;color:#555;width:160px;height:30px;line-height:30px;font-size:14px;font-weight:700">
+		<p></p>
+		<span>终点为:</span>
+		<input type="text" readonly="" id="endPointText" style="display:inline-block;background:#EBEBE4;border:#7F9DB9 solid 1px;color:#555;width:160px;height:30px;line-height:30px;font-size:14px;font-weight:700">
+		<p></p>
+		<span>最短距离为:</span>
+		<input type="text" readonly="" id="result" style="display:inline-block;background:#EBEBE4;border:#7F9DB9 solid 1px;color:#555;width:160px;height:30px;line-height:30px;font-size:14px;font-weight:700">
+		<p></p>
+		<input name="计算距离" class="button blue" type="button" id="getShortestDistance" value="计算距离" onclick="start()">&nbsp;&nbsp;
+		<input name="清除路径" class="button blue" type="button" id="clearPaths" value="清除路径" onclick="clearPaths()">
+		<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
+		
+	</div>	
+
+	<div class="select" id="combobox">
+		<span><h4>历史记录</h4></span>
+		<select name='make' id="history" onchange="setPolyline()">
+		</select>
+		<br><br>
+		<input name="清除历史记录" class="button white medium" type="button" id="clearHistory" value="清除历史记录" onclick="clearHistory()">
+		
+		<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
+	</div>
+	
+	<div id="routePlan">
+		<span><h4>路径规划</h4></span>
+		<input type="text" readonly="" id="routePlanText" style="display:inline-block;border:#7F9DB9 solid 1px;color:#555;width:200px;height:50px;line-height:30px;font-size:14px;font-weight:700" wrap="virtual" word-wrap:break-word; 
+    word-break:break-all;>
+		<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
+	</div>
+	
+	<div id="lushu">
+		<span><h4>路书</h4></span>
+		<input name="开始" class="button white bigrounded" type="button" id="startLuShu" value="开始" onclick="startLuShu()">
+		<input name="暂停" class="button white bigrounded" type="button" id="pauseLuShu" value="暂停" onclick="pauseLuShu()">
+		
+	</div>
+
+	<div id="bottomComponents">
+		<p style="color:black;font-weight:600">
+			745125931@qq.com 
+		</p>
+	</div>
+	
+</body>
+<script type="text/javascript">
+	//将页面中的所有元素设置为绝对的位置
+	var baidumap = document.getElementById("map");
+	baidumap.style.position = "absolute";
+	baidumap.style.top = "0px";
+	baidumap.style.left = "5px"
+
+	var components = document.getElementById("componentsDiv");
+	components.style.position = "absolute";
+	components.style.top = "3px";
+	components.style.right = "150px";
+
+	var combobox = document.getElementById("combobox");
+	combobox.style.position = "absolute";
+	combobox.style.left = "830px";
+	combobox.style.top = "320px";
+
+	var bottomComponents = document.getElementById("bottomComponents");
+	bottomComponents.style.position = "absolute";
+	bottomComponents.style.bottom = "2px";
+	
+	var routeplan = document.getElementById("routePlan");
+	routeplan.style.position = "absolute";
+	routeplan.style.left = "830px";
+	routeplan.style.top = "440px";
+	
+	var lushu = document.getElementById("lushu");
+	lushu.style.position = "absolute";
+	lushu.style.left = "830px";
+	lushu.style.top = "590px";
+
+	//变量：
+	var startpoint = new Array(),
+		endpoint = new Array(),
+		i, j, m, n;
+
+	var graph = new Array(Constant.graph_n); // 初始化图的变量
+
+	var P = new Array(Constant.graph_n); //用于记录路径
+
+	var D = new Array(Constant.graph_n); // 存两点间最短路径的二维矩阵
+	var shortestpath = new Array(); // 定义两点之间的最短路径
+	
+	var polyline, polylines = new Array(); //折线; 存储上一次路线的折线;
+	var data_info = []; //用于存储覆盖物的信息，显示信息窗口
+	var opts = {
+		width: 170, // 信息窗口宽度
+		height: 70, // 信息窗口高度
+		title: "<p><p>", // 信息窗口标题
+		enableMessage: true //设置允许信息窗发送短息
+	};
+	
+	var lushu; // 路书
+	var points = new Array(); //路书需要的点集
+	var myicon = new BMap.Icon('mario.png', new BMap.Size(52, 26), {
+			anchor: new BMap.Size(27, 13)
+		});
+
+
+	//初始化P
+	for (let i = 0; i < Constant.graph_n; ++i) {
+		P[i] = new Array(Constant.graph_n);
+	}
+	for (let i = 0; i < Constant.graph_n; ++i) {
+		for (let j = 0; j < Constant.graph_n; ++j) {
+			P[i][j] = 0;
+		}
+	}
+
+	//初始化一个Constant.graph_n × Constant.graph_n的图
+	for (i = 0; i < Constant.graph_n; ++i) {
+		graph[i] = new Array(Constant.graph_n);
+	}
+	for (i = 0; i < Constant.graph_n; ++i) { //初始化图
+		for (j = 0; j < Constant.graph_n; ++j) {
+			if (i === j) {
+				graph[i][j] = 0; //如果是自身到自身，则距离为0
+			} else {
+				graph[i][j] = Infinity; // 先将不是对角线的每个元素都初始化为正无穷大
+			}
+		}
+	}
+
+	//初始化data_info
+	for (i = 0; i < Constant.scupoint_n; ++i) {
+		var temp = [scupoint[i].lng, scupoint[i].lat, scupoint[i].name];
+		data_info.push(temp);
+	}
+
+
+	/*
+	graph[0][15] = getDistance(scupoint[0].lng, scupoint[0].lat, hiddenpoint[0].lng, hiddenpoint[0].lat);
+	alert(graph[0][15]);*/
+
+	//计算每两个点的距离并保存在图graph中
+	for (i = 0; i < connections.length; ++i) {
+		//connections[i].x, connections[i].y 为二维数组中的实际下标
+		//注意这是无向图
+		if (connections[i].x < Constant.scupoint_n && connections[i].y < Constant.scupoint_n) { //两个都是scupoint
+			m = connections[i].x;
+			n = connections[i].y;
+			graph[connections[i].x][connections[i].y] = getDistance(scupoint[m].lng, scupoint[m].lat, scupoint[n].lng, scupoint[n].lat);
+			graph[connections[i].y][connections[i].x] = graph[connections[i].x][connections[i].y];
+
+		} else if (connections[i].x < Constant.scupoint_n && connections[i].y >= Constant.scupoint_n) { // 第一个是scupoint,第二个是hiddenpoint并且第二个应该减去Constant.scupoint_n，因为二维数组前Constant.scupoint_n个是scupoint
+			m = connections[i].x;
+			n = (connections[i].y) - Constant.scupoint_n;
+			graph[connections[i].x][connections[i].y] = getDistance(scupoint[m].lng, scupoint[m].lat, hiddenpoint[n].lng, hiddenpoint[n].lat);
+			graph[connections[i].y][connections[i].x] = graph[connections[i].x][connections[i].y];
+
+		} else if (connections[i].x >= Constant.scupoint_n && connections[i].y < Constant.scupoint_n) { //第一个是hiddenpoint,第二个是scupoint
+			m = (connections[i].x) - Constant.scupoint_n;
+			n = connections[i].y;
+			graph[connections[i].x][connections[i].y] = getDistance(hiddenpoint[m].lng, hiddenpoint[m].lat, scupoint[n].lng, scupoint[n].lat);
+			graph[connections[i].y][connections[i].x] = graph[connections[i].x][connections[i].y];
+
+
+		} else if (connections[i].x >= Constant.scupoint_n && connections[i].y >= Constant.scupoint_n) { // 两个都是hiddenpoint
+			m = (connections[i].x) - Constant.scupoint_n;
+			n = (connections[i].y) - Constant.scupoint_n;
+			graph[connections[i].x][connections[i].y] = getDistance(hiddenpoint[m].lng, hiddenpoint[m].lat, hiddenpoint[n].lng, hiddenpoint[n].lat);
+			graph[connections[i].y][connections[i].x] = graph[connections[i].x][connections[i].y];
+
+		}
+	}
+
+	//初始化D
+	for (i = 0; i < Constant.graph_n; ++i) { //存两点间最短路径的二维矩阵
+		D[i] = new Array(Constant.graph_n);
+	}
+	for (i = 0; i < Constant.graph_n; ++i) {
+		for (j = 0; j < Constant.graph_n; ++j) {
+			D[i][j] = graph[i][j];
+		}
+	}
+	
+	//调用Floyd函数，计算距离
+	[D, P] = floyd(graph, P);
+
+
+	//初始化地图
+	var map = new BMap.Map("map");
+	var centerpoint = new BMap.Point(104.008759, 30.565837);
+	map.centerAndZoom(centerpoint, 16);
+
+
+
+	//设置地图事件
+	map.enableScrollWheelZoom();
+	map.enableKeyboard();
+	map.enableDragging();
+	map.enableDoubleClickZoom();
+
+
+	//向地图添加控件
+	var scaleControl = new BMap.ScaleControl({
+		anchor: BMAP_ANCHOR_BOTTOM_LEFT
+	});
+	scaleControl.setUnit(BMAP_UNIT_IMPERIAL);
+	map.addControl(scaleControl);
+
+	var navControl = new BMap.NavigationControl({
+		anchor: BMAP_ANCHOR_TOP_LEFT,
+		type: BMAP_NAVIGATION_CONTROL_LARGE
+	});
+	map.addControl(navControl);
+
+	var overView = new BMap.OverviewMapControl();
+	var overViewOpen = new BMap.OverviewMapControl({
+		isOpen: true,
+		anchor: BMAP_ANCHOR_BOTTOM_RIGHT
+	});
+
+
+
+	//定义marker覆盖物
+
+	for (i = 0; i < scupoint.length; ++i) {
+		var markerMenu = new BMap.ContextMenu();
+		var point = new BMap.Point(scupoint[i].lng, scupoint[i].lat);
+		var marker = new BMap.Marker(point);
+
+		markerMenu.addItem(new BMap.MenuItem('设为起点', setStartPoint.bind(marker)));
+		markerMenu.addItem(new BMap.MenuItem('设为终点', setEndPoint.bind(marker)));
+
+		map.addOverlay(marker);
+		marker.addContextMenu(markerMenu);
+
+		//信息窗口
+		var content = scupoint[i].name + 　": " + "(" + scupoint[i].lng + "," + scupoint[i].lat + ")";
+		addClickHandler(content, marker);
+
+	}
+
+
+	//设置地图显示范围(必须放在设置覆盖物代码的后面)
+	var b = new BMap.Bounds(new BMap.Point(103.996974, 30.55657), new BMap.Point(104.014509, 30.572243));
+	try {
+		BMapLib.AreaRestriction.setBounds(map, b);
+	} catch (e) {
+		alert(e);
+	}
+</script>
+
+</html>
