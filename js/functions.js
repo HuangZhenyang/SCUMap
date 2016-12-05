@@ -438,7 +438,7 @@ function routePlan() {
 	for (let i = 0; i < points.length - 1; ++i) {
 		sindex = getIndex(points[i]);
 		eindex = getIndex(points[i + 1]);
-		alert("sindex为"+sindex+"  eindex为"+eindex);
+		//alert("sindex为"+sindex+"  eindex为"+eindex);
 		direction = getDirection(points[i].lng, points[i].lat, points[i + 1].lng, points[i + 1].lat);
 		//alert(direction);
 
@@ -455,7 +455,7 @@ function routePlan() {
 			//alert("东南");
 			tip += "向东南";
 		}
-		alert(D[sindex][eindex]);
+		//alert(D[sindex][eindex]);
 		tip += ("走" + (D[sindex][eindex].toFixed(2)) + "米");
 		//tip += "走";
 		//tip += parseFloat(D[sindex][eindex]).toFixed(2);
