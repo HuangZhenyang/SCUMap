@@ -295,13 +295,13 @@ function clearPaths() {
 
 	//把文本框内容清除
 	setText("", "", "");
-	
+
 	//清除路径规划
 	routeplan.value = "";
-	
+
 	//清除路径规划提示信息
 	tip = "";
-	
+
 	points.length = 0;
 }
 
@@ -362,13 +362,14 @@ function setPolyline() {
 	drawPath(startpoint, endpoint, sindex, eindex);
 
 	setText(scupoint[sindex].name, scupoint[eindex].name, D[sindex][eindex]);
-	
-	
+
+
 }
 
 //清除历史记录
 function clearHistory() {
-	var historylist = document.getElementById("history"), routeplan = document.getElementById("routePlanText");
+	var historylist = document.getElementById("history"),
+		routeplan = document.getElementById("routePlanText");
 	var l = historylist.length; // 因为清掉以后historylist长度会变化
 	for (let i = 0; i < l; ++i) {
 		historylist.remove(0); // 清掉以后historylist里的元素下边会改变
@@ -379,7 +380,7 @@ function clearHistory() {
 
 	//清除文本框的内容
 	setText("", "", "");
-	
+
 	//清除路径信息
 	routeplan.value = "";
 }
@@ -432,35 +433,38 @@ function getDirection(sLng, sLat, eLng, eLat) {
 
 //路线规划函数
 function routePlan() {
-	var sindex, eindex, direction, tip = "",routePlanText = document.getElementById("routePlanText");
+	var sindex, eindex, direction, tip = "",
+		routePlanText = document.getElementById("routePlanText");
 	for (let i = 0; i < points.length - 1; ++i) {
 		sindex = getIndex(points[i]);
 		eindex = getIndex(points[i + 1]);
-		
+		alert("sindex为"+sindex+"  eindex为"+eindex);
 		direction = getDirection(points[i].lng, points[i].lat, points[i + 1].lng, points[i + 1].lat);
 		//alert(direction);
-		
-		if(direction === 1){
+
+		if (direction === 1) {
 			//alert("东北");
 			tip += "向东北";
-		}else if(direction === 2){
+		} else if (direction === 2) {
 			//alert("西北");
 			tip += "向西北";
-		}else if(direction === 3){
+		} else if (direction === 3) {
 			//alert("西南");
 			tip += "向西南";
-		}else if(direction === 4){
+		} else if (direction === 4) {
 			//alert("东南");
 			tip += "向东南";
 		}
-		
+		alert(D[sindex][eindex]);
 		tip += ("走" + (D[sindex][eindex].toFixed(2)) + "米");
-		
-		if(eindex < scupoint.length){
+		//tip += "走";
+		//tip += parseFloat(D[sindex][eindex]).toFixed(2);
+		//tip += "米";
+		if (eindex < scupoint.length) {
 			tip += ("到达" + scupoint[eindex].name);
 		}
 		tip += ";\r\n";
-		
+
 	}
 	alert(tip);
 	routePlanText.value = tip;
@@ -476,7 +480,7 @@ function getIndex(point) {
 
 	for (let i = 0; i < hiddenpoint.length; ++i) {
 		if (point.lng === hiddenpoint[i].lng && point.lat === hiddenpoint[i].lat) {
-			return i + scupoint.length + 1;
+			return i + scupoint.length;
 		}
 	}
 
