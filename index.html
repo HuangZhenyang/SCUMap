@@ -68,16 +68,20 @@
 	
 	<div id="routePlan">
 		<span><h4>路径规划</h4></span>
+		<!--
 		<input type="text" id="routePlanText" style="display:inline-block;border:#7F9DB9 solid 1px;color:#555;width:300px;height:50px;line-height:30px;font-size:14px;font-weight:700" wrap="virtual" word-wrap:break-word; 
     word-break:break-all;>
+    	-->
+    	<div id="routePlanText"></div>
 		<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
 	</div>
 	
 	<div id="lushu">
+		<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
 		<span><h4>路书</h4></span>
 		<input name="开始" class="button white bigrounded" type="button" id="startLuShu" value="开始" onclick="startLuShu()">
 		<input name="暂停" class="button white bigrounded" type="button" id="pauseLuShu" value="暂停" onclick="pauseLuShu()">
-		
+		<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
 	</div>
 
 	<div id="bottomComponents">
@@ -97,7 +101,7 @@
 	var components = document.getElementById("componentsDiv");
 	components.style.position = "absolute";
 	components.style.top = "3px";
-	components.style.right = "150px";
+	components.style.right = "400px";
 
 	var combobox = document.getElementById("combobox");
 	combobox.style.position = "absolute";
@@ -115,8 +119,9 @@
 	
 	var lushu = document.getElementById("lushu");
 	lushu.style.position = "absolute";
-	lushu.style.left = "830px";
-	lushu.style.top = "510px";
+	//lushu.style.margin = 2px;
+	lushu.style.right = "180px";
+	lushu.style.bottom = "400px";
 
 	//变量：
 	var startpoint = new Array(),
