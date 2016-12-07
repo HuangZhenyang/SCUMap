@@ -361,7 +361,7 @@ function setPolyline() {
 
 	drawPath(startpoint, endpoint, sindex, eindex);
 
-	setText(scupoint[sindex].name, scupoint[eindex].name, D[sindex][eindex]);
+	setText(scupoint[sindex].name, scupoint[eindex].name, D[sindex][eindex].toFixed(2));
 
 
 }
